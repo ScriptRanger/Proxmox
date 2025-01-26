@@ -5,7 +5,7 @@ In diesem Repository sammle ich alles rund um die Installation, Konfiguration un
 ## Inhalte
 
 - [Einführung](#einführung)
-- [Architektur](#architektur)
+- [Architektur](./Architektur/README.md)
 - [Installation](#installation)
 - [Konfiguration](#konfiguration)
 - [Problemlösungen](#problemlösungen)
