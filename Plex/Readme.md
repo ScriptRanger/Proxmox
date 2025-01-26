@@ -5,6 +5,7 @@ In diesem Repository sammle ich alles rund um die Installation, Konfiguration un
 ## Inhalte
 
 - [Einführung](#einführung)
+- [Architektur](#architektur)
 - [Installation](#installation)
 - [Konfiguration](#konfiguration)
 - [Problemlösungen](#problemlösungen)
@@ -14,6 +15,12 @@ In diesem Repository sammle ich alles rund um die Installation, Konfiguration un
 
 ### Einführung
 Kurze Beschreibung, was Plex ist und wofür es verwendet wird.
+
+### Architektur
+Bildliche Darstellung des Setups:
+- **Proxmox Server:** Hostet TrueNAS und den LXC-Container mit Docker.
+- **TrueNAS:** Verwaltert RAID 5 und stellt die SMB-Freigabe für Plex bereit.
+- **Plex:** Läuft als Docker-Container in Portainer und greift auf die SMB-Freigabe zu.
 
 ### Installation
 Schritte zur Installation auf verschiedenen Plattformen (Proxmox, Docker, etc.).
