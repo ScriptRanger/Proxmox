@@ -2,7 +2,7 @@
 
 Dieses Diagramm zeigt den Aufbau des Plex-Setups:
 
-![Plex Architektur](./plex_architektur.png)
+![Plex Architektur](./plex_architektur.drawio.png)
 
 ## Details
 - **Proxmox Server**: Hostet TrueNAS in einer VM und den LXC-Container für Docker.
