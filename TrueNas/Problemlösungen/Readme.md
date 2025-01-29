@@ -1,46 +1,58 @@
-Plex-Server auf Proxmox mit TrueNAS Storage
-Überblick
-Dieses Projekt beschreibt die Installation und Fehlerbehebung eines Plex-Medienservers, der in einem LXC-Container mit Docker & Portainer auf einem Proxmox-Host läuft. Die Medien liegen auf einer TrueNAS-VM und werden über eine SMB-Freigabe eingebunden.
+🚨 Problemlösungen
+Hier sind die wichtigsten Herausforderungen und Lösungen, die wir während der Einrichtung und Migration gefunden haben.
 
-Setup & Architektur
-Host: Proxmox
-Container: LXC mit Docker & Portainer
-Media Storage: TrueNAS SMB-Share
-Mount-Pfad im LXC-Container: /mnt/medien
-Docker-Stack-Verwaltung: Portainer
-Problemstellung & Lösungen
-1. Plex konnte nicht auf Medien zugreifen
-Grund:
+📆 28.01.2025 - TrueNAS CORE & Plex Jail Setup
+❌ Problem 1: Plex konnte nicht auf Medien zugreifen
+📌 Ursache:
 
-Plex-Docker-Container lief mit PUID=4001 / PGID=3002, während die Dateien auf TrueNAS plexuser gehörten.
-CIFS-Mount in LXC ohne korrekte uid und gid.
-Lösung:
+Plex-Docker-Container lief mit PUID=4001 / PGID=3002, während die SMB-Freigabe auf TrueNAS einen anderen Benutzer nutzte.
+Falsche Mount-Optionen führten dazu, dass Plex keinen Zugriff hatte.
+✅ Lösung:
 
-Korrekte Mount-Optionen für SMB in LXC:
-bash
-Kopieren
-Bearbeiten
-mount -t cifs -o username=plexuser,password='+Plex@2025!8165',iocharset=utf8,uid=4001,gid=3002 //192.168.178.6/Medien /mnt/medien
-TrueNAS plexuser wurde der Gruppe mediagroup hinzugefügt, um Schreib-/Lesezugriff zu gewähren.
-Plex-Container wurde gestoppt, gelöscht und neu erstellt, damit er die neuen Berechtigungen nutzt.
-2. Unterordner wurden nicht in Plex angezeigt
-Grund:
+Richtige UID/GID in Docker-Container setzen
+SMB-Freigabe mit korrekten Mount-Optionen eingebunden
+Plex-Container neu erstellt
+❌ Problem 2: Plugins lassen sich nicht installieren (Fehler: 13.2-RELEASE not found!)
+📌 Ursache:
 
-Plex erkennt standardmäßig keine Unterordner rekursiv.
-Berechtigungen waren nicht korrekt vererbt.
-Lösung:
+TrueNAS CORE versuchte alte FreeBSD 13.2-Plugins zu laden, die nicht mehr verfügbar sind.
+Offizielle Plugin-Unterstützung in TrueNAS CORE wurde praktisch eingestellt.
+✅ Lösung:
 
-Manuelles Scannen der Bibliothek in Plex angestoßen.
-Berechtigungen von /mnt/medien überprüft & rekursiv gesetzt:
-bash
-Kopieren
-Bearbeiten
-chmod -R 775 /mnt/medien
-chown -R plexuser:mediagroup /mnt/medien
-3. Performance-Optimierung für Plex
-LXC-Container hat jetzt 8 Kerne & 16GB RAM.
-Transkodierung: Wird aktuell CPU-basiert durchgeführt → GPU-Beschleunigung als nächster Schritt.
-Offene Aufgaben
-Performance-Tests mit mehreren gleichzeitigen Streams.
-GPU-Beschleunigung für Plex-Transcoding testen.
-TrueNAS auf CORE umstellen & SMB-Integration prüfen.
+Manuelle Installation der Jails mit FreeBSD 13.4-RELEASE
+Netzwerkprobleme behoben, VNET & Bridge0 für Plex optimiert
+📆 29.01.2025 - Entscheidung für TrueNAS SCALE & Docker
+Nachdem sich herausgestellt hat, dass TrueNAS CORE nicht mehr zukunftssicher für Plugins ist, wurde die Entscheidung getroffen:
+
+🚀 Umstieg auf TrueNAS SCALE
+
+Docker & Kubernetes statt veralteter Jails
+Industrie-Standard für Containerisierung nutzen
+Volle Flexibilität für Plex, Nextcloud & zukünftige Services
+✅ Warum SCALE?
+
+Docker-Support ohne Hacks
+Einfache Integration von Apps & Updates
+Kubernetes für fortgeschrittene Skalierung
+🎯 Lessons Learned & Fazit
+TrueNAS CORE ist für Storage top, aber Plugins sind tot.
+Für moderne Setups ist Docker/Kubernetes in SCALE der bessere Weg.
+VNET & Bridge0 sind essenziell für Netzwerkstabilität.
+UID/GID-Berechtigungen sauber setzen, um SMB-Probleme zu vermeiden.
+Plex läuft besser unter Docker als in einer Jail.
+🔗 Ressourcen
+📌 Offizielle TrueNAS-Dokumentation → TrueNAS Docs
+📌 Proxmox & TrueNAS Integration → Proxmox Wiki
+📌 Plex Media Server Setup → Plex Support
+📌 Docker & Kubernetes Einführung → Docker Docs
+
+🚀 Nächste Schritte
+1️⃣ TrueNAS SCALE final einrichten
+2️⃣ Plex als Docker-Container sauber installieren
+3️⃣ Docker-Volumes für Medienstruktur optimieren
+4️⃣ Zusätzliche Apps testen (Nextcloud, Home Assistant, etc.)
+
+📌 Fazit:
+💡 TrueNAS CORE war ein guter Test, aber die Zukunft liegt in SCALE & Docker.
+💡 Die Entscheidung für SCALE war ein logischer Schritt in Richtung professionelle, skalierbare Lösungen.
+💡 Mit diesem Setup ist Plex optimal für Zukunft & Industrie-Standards gerüstet.
