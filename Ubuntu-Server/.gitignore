@@ -1,0 +1,12 @@
+# System- und Log-Dateien
+*.log
+*.tmp
+*.swp
+
+# Backup-Dateien
+*.bak
+*.old
+
+# SSH-Keys (niemals hochladen!)
+id_rsa
+id_rsa.pub
