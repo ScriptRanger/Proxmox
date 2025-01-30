@@ -1,6 +1,8 @@
 🚨 Problemlösungen
 Hier sind die wichtigsten Herausforderungen und Lösungen, die wir während der Einrichtung und Migration gefunden haben.
 
+_________________________________________________________________________________________________________________________________
+
 📆 28.01.2025 - TrueNAS CORE & Plex Jail Setup
 ❌ Problem 1: Plex konnte nicht auf Medien zugreifen
 📌 Ursache:
@@ -21,6 +23,9 @@ Offizielle Plugin-Unterstützung in TrueNAS CORE wurde praktisch eingestellt.
 
 Manuelle Installation der Jails mit FreeBSD 13.4-RELEASE
 Netzwerkprobleme behoben, VNET & Bridge0 für Plex optimiert
+
+__________________________________________________________________________________________________________________________________
+
 📆 29.01.2025 - Entscheidung für TrueNAS SCALE & Docker
 Nachdem sich herausgestellt hat, dass TrueNAS CORE nicht mehr zukunftssicher für Plugins ist, wurde die Entscheidung getroffen:
 
@@ -56,3 +61,49 @@ Plex läuft besser unter Docker als in einer Jail.
 💡 TrueNAS CORE war ein guter Test, aber die Zukunft liegt in SCALE & Docker.
 💡 Die Entscheidung für SCALE war ein logischer Schritt in Richtung professionelle, skalierbare Lösungen.
 💡 Mit diesem Setup ist Plex optimal für Zukunft & Industrie-Standards gerüstet.
+
+__________________________________________________________________________________________________________________________________
+
+📆 30.01.2025 - Wiederherstellung der HDDs nach PCIe Passthrough-Änderung
+
+❌ Problem 3: Nach Rückbau von PCIe Passthrough wurden die HDDs nicht mehr erkannt
+📌 Ursache:
+Nach dem Entfernen von PCIe-Passthrough in Proxmox war der AHCI-Controller nicht mehr aktiv. Das führte dazu, dass die SATA-HDDs in Proxmox nicht mehr sichtbar waren.
+
+✅ Lösung:
+
+Überprüfung des Controllers mit lspci -nnk | grep -iA3 sata
+→ Ergebnis: Der AHCI-Controller war sichtbar, aber ohne aktiven Treiber.
+Manuelles Laden des AHCI-Treibers mit modprobe ahci
+→ Die HDDs wurden sofort wieder erkannt.
+Dauerhafte Lösung für Neustarts:
+Systemd-Service erstellt, um modprobe ahci beim Booten auszuführen:
+bash
+Kopieren
+Bearbeiten
+echo -e "[Unit]
+Description=Load AHCI Module
+After=systemd-modules-load.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/modprobe ahci
+
+[Install]
+WantedBy=multi-user.target" | sudo tee /etc/systemd/system/load-ahci.service
+Service aktiviert und gestartet:
+bash
+Kopieren
+Bearbeiten
+systemctl enable load-ahci.service
+systemctl start load-ahci.service
+Neustart-Test durchgeführt:
+→ HDDs wurden nach dem Booten automatisch erkannt.
+🎯 Lessons Learned:
+
+Nach Deaktivierung von PCIe-Passthrough muss der AHCI-Treiber manuell oder über einen Systemd-Service geladen werden.
+Ohne den Treiber bleiben die SATA-HDDs in Proxmox unsichtbar.
+Systemd-Service als Fix: Damit wird modprobe ahci bei jedem Boot automatisch ausgeführt.
+
+______________________________________________________________________________________________________________________________________
+
