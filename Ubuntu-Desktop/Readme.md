@@ -22,3 +22,8 @@
 sudo nano /etc/netplan/00-installer-config.yaml
 # Statische IP-Adresse eintragen
 sudo netplan apply
+
+
+Ubuntu Server Dokumentation: https://ubuntu.com/server/docs
+# Samba Offizielle Dokumentation: https://www.samba.org/samba/docs/
+# Proxmox Wiki: https://pve.proxmox.com/wiki/Main_Page
