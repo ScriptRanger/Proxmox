@@ -1,5 +1,5 @@
 
-# Ubuntu Server auf Proxmox – Techstarter Training
+# Ubuntu Server auf Proxmox
 
 Dieses Repository enthält Konfigurationsdateien, Skripte und Dokumentationen für meine professionelle Entwicklungsumgebung auf einem Ubuntu Server in einer Proxmox-VM.
 
